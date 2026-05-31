@@ -5,6 +5,8 @@ import json
 
 load_dotenv()
 
+with open("problem.json", "r", encoding="utf-8") as f:
+    problems = json.load(f)
 
 # Chatting use DeepSeek
 chat_client = OpenAI(
@@ -12,13 +14,42 @@ chat_client = OpenAI(
     base_url="https://api.deepseek.com"
 )
 
-messages=[
-    {"role": "system", "content": "你现在是一个算法老师"},
-     {"role": "user", "content": "leetcode的hot100的两数之和：给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，并返回它们的数组下标。你可以假设每种输入只会对应一个答案，并且你不能使用两次相同的元素。你可以按任意顺序返回答案。"}
+problem_id = input("请输入题号：").strip()
+problem = problems.get(problem_id)
+
+if not problem:
+    print(f"题号 {problem_id} 不存在")
+    exit()
+
+system_prompt = """你是经验丰富的算法老师，专门辅导 LeetCode 题目。
+请按以下结构回答：
+1. 思路（2-3 句话，讲清楚为什么用这个方法）
+2. Java 代码（带关键步骤注释）
+3. 时间复杂度 + 空间复杂度
+4. 关键点（这道题考察什么知识点）"""
+
+user_prompt = f"""请讲解这道题：
+
+题号：{problem_id}
+标题：{problem['title']}
+难度：{problem['difficulty']}
+描述：{problem['description']}"""
+
+
+messages = [
+    {"role": "system", "content": system_prompt},
+    {"role": "user", "content": user_prompt}
 ]
 
 resp = chat_client.chat.completions.create(
-            model="deepseek-chat",
-            messages=messages
-        )
-print(resp.choices[0].message.content)
+    model="deepseek-chat",
+    messages=messages
+)
+output=resp.choices[0].message.content
+print(output)
+
+# 保存输出到文件
+os.makedirs("outputs", exist_ok=True)
+with open(f"outputs/lc{problem_id}_output.md", "w", encoding="utf-8") as f:
+    f.write(f"# LC{problem_id} {problem['title']}\n\n")
+    f.write(output)
