@@ -1,0 +1,23 @@
+# 密钥和环境变量
+.env
+.env.local
+*.key
+
+# Python 虚拟环境
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# macOS
+.DS_Store
+
+# 项目临时文件
+tempCodeRunnerFile.py
+*.log
