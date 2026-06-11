@@ -59,3 +59,22 @@ PP-001: 先正确，后优化（来源：2026-06-04 dogfooding）
 ### 待暑期建库时统一处理
 - 提炼自刷题日志的"关键学到的"字段
 - 估计 v1 总量：10-20 条
+
+## RAG v0.2 改进计划（2026-06-12 规划）
+
+### v0.2.A（明天 6/13，半天）
+- 改 distance metric 为 cosine
+- 换 embedding 模型为 BGE-large-zh 或 Qwen3-Embedding
+- 跑同样 5 个 query 对比
+- 产出：eval/v02a_results.md
+
+### v0.2.B（6/14 - 6/15，视 A 效果而定）
+- 如果 A 效果好（召回准确率 > 60%）→ 暂不做 chunking，转去做 KP 内容修订
+- 如果 A 效果差（< 60%）→ 做 chunking（按 ## H2 切分）
+
+### v0.2.C（暑期再做）
+- Hybrid search（BM25 + 向量）
+- Rerank（接 bge-reranker）
+
+### 注意
+**不要同时改多个变量**。一次只动一个，留对照基线。
