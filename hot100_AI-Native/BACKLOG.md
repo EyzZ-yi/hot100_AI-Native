@@ -78,3 +78,41 @@ PP-001: 先正确，后优化（来源：2026-06-04 dogfooding）
 
 ### 注意
 **不要同时改多个变量**。一次只动一个，留对照基线。
+
+## GustoBot 启发的 v0.3 + v1.0 路线（2026-06-XX）
+
+### 来源
+读了 GustoBot README（github.com/skygazer42/GustoBot），是一个三层 multi-agent 智能客服系统。
+
+### 借鉴的设计思想（不抄技术栈，只学方法论）
+
+#### 1. 三层架构（L1 路由 / L2 子图 / L3 工具）
+- 当前我的项目：单层 RAG
+- v0.3 目标：拆出 L1 + L2 + L3
+- L1：意图分类（诊断/题解/复习/推荐）
+- L2：每种意图对应的子流程
+- L3：原子工具（retrieve_ep / retrieve_kp / get_user_state / call_llm）
+
+#### 2. PostgreSQL 优先兜底 → 改为"SQLite 优先 → RAG 兜底"
+- 用户状态查询走 SQLite（确定性）
+- 知识检索走 RAG（不确定性）
+- 显式区分两者，不让 LLM 编
+
+#### 3. Guardrails 边界控制
+- 拒绝超出 hot100 / 代随 / 算法学习的查询
+- 显式告知用户边界，建议他们用 Claude / GPT
+
+#### 4. 来源标注
+- 每个回答标明引用的 EP-XXX / KP-XXX / PP-XXX
+- 提升可追溯性 + 调试方便
+
+### 不学的部分（这些是 GustoBot 的过度工程，不适合我的体量）
+- Neo4j 图谱（hot100 关系手工 JSON 标即可）
+- Microsoft GraphRAG（数据量不够）
+- Map-Reduce 并行（单一查询不需要）
+- Reranker 双阈值（v0.2 命中率已经 100%）
+- 多模态（不在我的产品范围）
+
+### 实施时间表
+- v0.3（暑期前半 7/15-8/4）：三层架构 + Guardrails + 来源标注
+- v1.0（暑期后半 8/5-8/25）：兜底策略 + SQLite 用户状态
